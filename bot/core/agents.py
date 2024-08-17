@@ -138,7 +138,7 @@ existing_versions = {
 
 
 def generate_random_user_agent(device_type='android', browser_type='chrome'):
-    firefox_versions = list(range(100, 127))  # Last 10 versions of Firefox
+    firefox_versions = list(range(120, 127))
 
     if browser_type == 'chrome':
         major_version = random.choice(list(existing_versions.keys()))
@@ -147,7 +147,7 @@ def generate_random_user_agent(device_type='android', browser_type='chrome'):
         browser_version = random.choice(firefox_versions)
 
     if device_type == 'android':
-        android_versions = ['7.0', '7.1', '8.0', '8.1', '9.0', '10.0', '11.0', '12.0', '13.0', '14.0', '15.0']
+        android_versions = ['9.0', '10.0', '11.0', '12.0', '13.0', '14.0']
         android_device = random.choice([
             'SM-G960F', 'SM-G973F', 'SM-G980F', 'SM-G960U', 'SM-G973U', 'SM-G980U',
             'SM-A505F', 'SM-A515F', 'SM-A525F', 'SM-N975F', 'SM-N986B', 'SM-N981B',

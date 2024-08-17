@@ -15,6 +15,7 @@ from bot.config import settings
 from bot.utils import logger
 from bot.exceptions import InvalidSession
 from .headers import headers
+from .webapp import WebappURLs
 
 
 class Tapper:
@@ -155,8 +156,7 @@ class Tapper:
     async def auth(self, http_client: aiohttp.ClientSession):
         try:
             json = {"user_id": int(self.user_id), "username": str(self.username)}
-            response = await http_client.post(url='https://ago-api.onrender.com/api/app-auth', json=json,
-                                              ssl=False)
+            response = await http_client.post(url=WebappURLs.APP_AUTH, json=json, ssl=False)
             response.raise_for_status()
             response_json = await response.json()
             return response_json.get('token')
@@ -167,7 +167,7 @@ class Tapper:
         try:
             json = {}
 
-            http_client.headers['Host'] = 'ago-api.onrender.com'
+            http_client.headers['Host'] = 'ago-wallet.hexacore.io'
             if http_client.headers['Authorization'] is None or http_client.headers['Authorization'] == '':
                 http_client.headers['Authorization'] = await self.auth(http_client=http_client)
 
@@ -187,8 +187,7 @@ class Tapper:
             if self.username != '':
                 json = {"user_id": self.user_id, "fullname": f"{self.fullname}", "username": f"{self.username}",
                         "referer_id": f"{referer_id}"}
-                response = await http_client.post(url='https://ago-api.onrender.com/api/create-user', json=json,
-                                                  ssl=False)
+                response = await http_client.post(url=WebappURLs.CREATE_USER, json=json, ssl=False)
                 #print(await response.text())
                 #print(await response.json())
                 if response.status == 409:
@@ -209,19 +208,20 @@ class Tapper:
 
     async def get_taps(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url='https://ago-api.onrender.com/api/available-taps', ssl=False)
+            response = await http_client.get(url=WebappURLs.AVAILABLE_TAPS, ssl=False)
             response_json = await response.json()
+            # logger.debug(f"<light-yellow>{self.session_name}</light-yellow> | Available taps: {response_json.get('available_taps')}")
             return response_json.get('available_taps')
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get taps {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get taps {repr(ex_)}")
 
     async def get_balance(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url=f'https://ago-api.onrender.com/api/balance/{self.user_id}', ssl=False)
+            response = await http_client.get(url=f'{WebappURLs.BALANCE}/{self.user_id}', ssl=False)
             response_json = await response.json()
             return response_json
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get balance {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get balance {repr(ex_)}")
 
     async def do_taps(self, http_client: aiohttp.ClientSession, taps):
         try:
@@ -230,51 +230,48 @@ class Tapper:
 
             for _ in range(full_cycles):
                 json = {"taps": 40}
-                response = await http_client.post(url=f'https://ago-api.onrender.com/api/mining-complete', json=json,
-                                                  ssl=False)
+                response = await http_client.post(url=WebappURLs.MINING_COMPLETE, json=json, ssl=False)
                 response_json = await response.json()
                 if not response_json.get('success'):
                     return False
 
             if remainder > 0:
                 json = {"taps": remainder}
-                response = await http_client.post(url=f'https://ago-api.onrender.com/api/mining-complete', json=json,
-                                                  ssl=False)
+                response = await http_client.post(url=WebappURLs.MINING_COMPLETE, json=json, ssl=False)
                 response_json = await response.json()
                 if not response_json.get('success'):
                     return False
 
             return True
 
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while do taps {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while do taps {repr(ex_)}")
 
     async def get_missions(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url=f'https://ago-api.onrender.com/api/missions', ssl=False)
+            response = await http_client.get(url=WebappURLs.MISSIONS, ssl=False)
             response_json = await response.json()
             incomplete_mission_ids = [mission['id'] for mission in response_json if (not mission['isCompleted']
                                                                                      and mission['autocomplete'])]
 
             return incomplete_mission_ids
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get missions {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get missions {repr(ex_)}")
 
     async def do_mission(self, http_client: aiohttp.ClientSession, id):
         try:
             json = {'missionId': id}
-            response = await http_client.post(url=f'https://ago-api.onrender.com/api/mission-complete', json=json,
-                                              ssl=False)
+            response = await http_client.post(url=WebappURLs.MISSION_COMPLETE, json=json, ssl=False)
             response_json = await response.json()
             if not response_json.get('success'):
                 return False
             return True
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while doing missions {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while doing missions {repr(ex_)}")
 
     async def get_level_info(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url=f'https://ago-api.onrender.com/api/level', ssl=False)
+            response = await http_client.get(url=WebappURLs.LEVEL, ssl=False)
             response_json = await response.json()
             lvl = response_json.get('lvl')
             upgrade_available = response_json.get('upgrade_available')
@@ -282,52 +279,49 @@ class Tapper:
             return (lvl,
                     upgrade_available,
                     upgrade_price)
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get level {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get level {repr(ex_)}")
 
     async def level_up(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.post(url=f'https://ago-api.onrender.com/api/upgrade-level', ssl=False)
+            response = await http_client.post(url=WebappURLs.UPGRADE_LEVEL, ssl=False)
             response_json = await response.json()
             if not response_json.get('success'):
                 return False
             return True
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while up lvl {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while up lvl {repr(ex_)}")
 
     async def play_game_1(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url=f'https://ago-api.onrender.com/api/in-game-reward-available/1/'
+            response = await http_client.get(url=f'{WebappURLs.IN_GAME_REWARD_AVAILABLE}/1/'
                                                  f'{self.user_id}', ssl=False)
             response_json = await response.json()
             if response_json.get('available'):
                 json = {"game_id": 1, "user_id": self.user_id}
-                response1 = await http_client.post(url=f'https://ago-api.onrender.com/api/in-game-reward', json=json,
-                                                   ssl=False)
+                response1 = await http_client.post(url=WebappURLs.IN_GAME_REWARD, json=json, ssl=False)
                 if response1.status in (200, 201):
                     return True
             else:
                 return False
 
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 1 {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 1 {repr(ex_)}")
 
     async def play_game_2(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url=f'https://ago-api.onrender.com/api/in-game-reward-available/2/'
-                                                 f'{self.user_id}', ssl=False)
+            response = await http_client.get(url=f'{WebappURLs.IN_GAME_REWARD_AVAILABLE}/2/{self.user_id}', ssl=False)
             response_json = await response.json()
             if response_json.get('available'):
                 json = {"game_id": 2, "user_id": self.user_id}
-                response1 = await http_client.post(url=f'https://ago-api.onrender.com/api/in-game-reward', json=json,
-                                                   ssl=False)
+                response1 = await http_client.post(url=WebappURLs.IN_GAME_REWARD, json=json, ssl=False)
                 if response1.status in (200, 201):
                     return True
             else:
                 return False
 
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 2 {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 2 {repr(ex_)}")
 
     async def play_game_3(self, http_client: aiohttp.ClientSession):
         try:
@@ -367,8 +361,8 @@ class Tapper:
             logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Trying to upgrade items in dirty job, "
                         f"wait a bit")
             await self.auto_purchase_upgrades(http_client, balance, hub_items_owned, game_config_hub_items)
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 3 {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 3 {repr(ex_)}")
 
     async def auto_purchase_upgrades(self, http_client: aiohttp.ClientSession, balance: int, owned_items: dict,
                                      available_items: dict):
@@ -445,26 +439,24 @@ class Tapper:
 
     async def play_game_5(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url=f'https://ago-api.onrender.com/api/in-game-reward-available/5/'
+            response = await http_client.get(url=f'{WebappURLs.IN_GAME_REWARD_AVAILABLE}/5/'
                                                  f'{self.user_id}', ssl=False)
             response_json = await response.json()
             if response_json.get('available'):
                 json = {"game_id": 5, "user_id": self.user_id}
-                response1 = await http_client.post(url=f'https://ago-api.onrender.com/api/in-game-reward', json=json,
-                                                   ssl=False)
+                response1 = await http_client.post(url=WebappURLs.IN_GAME_REWARD, json=json, ssl=False)
                 if response1.status in (200, 201):
                     return True
             else:
                 return False
 
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 5 {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 5 {repr(ex_)}")
 
     async def daily_claim(self, http_client: aiohttp.ClientSession):
         try:
             json = {"user_id": self.user_id}
-            response = await http_client.post(url=f'https://ago-api.onrender.com/api/daily-reward', json=json,
-                                              ssl=False)
+            response = await http_client.post(url=WebappURLs.DAILY_REWARD, json=json, ssl=False)
             response_json = await response.json()
 
             tokens = response_json.get('tokens')
@@ -473,22 +465,21 @@ class Tapper:
             else:
                 return False
 
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while daily reward {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while daily reward {repr(ex_)}")
 
     async def get_tap_passes(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url=f'https://ago-api.onrender.com/api/get-tap-passes', ssl=False)
+            response = await http_client.get(url=WebappURLs.GET_TAP_PASSES, ssl=False)
             response_json = await response.json()
             return response_json
-        except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while getting tap passes {error}")
+        except Exception as ex_:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while getting tap passes {repr(ex_)}")
 
     async def buy_tap_pass(self, http_client: aiohttp.ClientSession):
         try:
             json = {"name": "7_days"}
-            response = await http_client.post(url=f'https://ago-api.onrender.com/api/buy-tap-passes', json=json,
-                                              ssl=False)
+            response = await http_client.post(url=WebappURLs.BUY_TAP_PASSES, json=json, ssl=False)
             response_json = await response.json()
             if response_json.get('status') is False:
                 return False
@@ -501,8 +492,8 @@ class Tapper:
             response = await http_client.get(url='https://httpbin.org/ip', timeout=aiohttp.ClientTimeout(45), ssl=False)
             ip = (await response.json()).get('origin')
             logger.info(f"{self.session_name} | Proxy IP: {ip}")
-        except Exception as error:
-            logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {error}")
+        except Exception as ex_:
+            logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {repr(ex_)}")
 
     async def run(self, proxy: str | None) -> None:
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
@@ -518,7 +509,8 @@ class Tapper:
         http_client.headers['Authorization'] = await self.auth(http_client=http_client)
         while True:
             try:
-                status = await self.register(http_client=http_client)
+                status = 'registered'
+                # status = await self.register(http_client=http_client)
                 if status is True:
                     logger.success(f"<light-yellow>{self.session_name}</light-yellow> | Successfully account register")
                 elif status == 'registered':
@@ -526,7 +518,7 @@ class Tapper:
 
                 info = await self.get_balance(http_client=http_client)
                 balance = info.get("balance") or 0
-                logger.info(f'<light-yellow>{self.session_name}</light-yellow> | Balance: {balance}')
+                logger.info(f'<light-yellow>{self.session_name}</light-yellow> | Balance: <g>{balance:,}</g> AGO')
 
                 tokens = await self.daily_claim(http_client=http_client)
                 if tokens is not False:
