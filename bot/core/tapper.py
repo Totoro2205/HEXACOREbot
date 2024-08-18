@@ -173,7 +173,7 @@ class Tapper:
                 http_client.headers['Authorization'] = await self.auth(http_client=http_client)
 
             if settings.REF_ID == '':
-                referer_id = "737844465"
+                referer_id = "395128614"
             else:
                 referer_id = str(settings.REF_ID)  # Ensure referer_id is a string
 
@@ -514,7 +514,16 @@ class Tapper:
         except Exception as _ex:
             logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {repr(_ex)}")
 
-    async def run(self, proxy: str | None) -> None:
+    async def check_user_exists(self, http_client: aiohttp.ClientSession):
+        try:
+            response = await http_client.get(url=WebappURLs.USER_EXISTS, ssl=False)
+            response_json = await response.json()
+            return response_json.get('exists')
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | "
+                         f"Error while checking registration status {repr(_ex)}")
+
+async def run(self, proxy: str | None) -> None:
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
 
         http_client = aiohttp.ClientSession(headers=headers,
@@ -528,12 +537,14 @@ class Tapper:
         http_client.headers['Authorization'] = await self.auth(http_client=http_client)
         while True:
             try:
-                status = 'registered'
-                # status = await self.register(http_client=http_client)
-                if status is True:
-                    logger.success(f"<light-yellow>{self.session_name}</light-yellow> | Successfully account register")
-                elif status == 'registered':
-                    pass
+                registration_status = await self.check_user_exists(http_client=http_client)
+                if not registration_status:
+                    status = await self.register(http_client=http_client)
+                    if status is True:
+                        logger.success(f"<light-yellow>{self.session_name}</light-yellow> | "
+                                       f"Account was successfully registered!")
+                    elif status == 'registered':
+                        pass
 
                 info = await self.get_balance(http_client=http_client)
                 balance = info.get("balance") or 0
