@@ -212,16 +212,16 @@ class Tapper:
             response_json = await response.json()
             # logger.debug(f"<light-yellow>{self.session_name}</light-yellow> | Available taps: {response_json.get('available_taps')}")
             return response_json.get('available_taps')
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get taps {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get taps {repr(_ex)}")
 
     async def get_balance(self, http_client: aiohttp.ClientSession):
         try:
             response = await http_client.get(url=f'{WebappURLs.BALANCE}/{self.user_id}', ssl=False)
             response_json = await response.json()
             return response_json
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get balance {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get balance {repr(_ex)}")
 
     async def do_taps(self, http_client: aiohttp.ClientSession, taps):
         try:
@@ -244,8 +244,8 @@ class Tapper:
 
             return True
 
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while do taps {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while do taps {repr(_ex)}")
 
     async def get_missions(self, http_client: aiohttp.ClientSession):
         try:
@@ -255,8 +255,8 @@ class Tapper:
                                                                                      and mission['autocomplete'])]
 
             return incomplete_mission_ids
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get missions {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get missions {repr(_ex)}")
 
     async def do_mission(self, http_client: aiohttp.ClientSession, id):
         try:
@@ -266,8 +266,8 @@ class Tapper:
             if not response_json.get('success'):
                 return False
             return True
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while doing missions {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while doing missions {repr(_ex)}")
 
     async def get_level_info(self, http_client: aiohttp.ClientSession):
         try:
@@ -279,8 +279,8 @@ class Tapper:
             return (lvl,
                     upgrade_available,
                     upgrade_price)
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get level {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while get level {repr(_ex)}")
 
     async def level_up(self, http_client: aiohttp.ClientSession):
         try:
@@ -289,8 +289,8 @@ class Tapper:
             if not response_json.get('success'):
                 return False
             return True
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while up lvl {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while up lvl {repr(_ex)}")
 
     async def play_game_1(self, http_client: aiohttp.ClientSession):
         try:
@@ -305,8 +305,8 @@ class Tapper:
             else:
                 return False
 
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 1 {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 1 {repr(_ex)}")
 
     async def play_game_2(self, http_client: aiohttp.ClientSession):
         try:
@@ -320,8 +320,8 @@ class Tapper:
             else:
                 return False
 
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 2 {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 2 {repr(_ex)}")
 
     async def play_game_3(self, http_client: aiohttp.ClientSession):
         try:
@@ -361,8 +361,8 @@ class Tapper:
             logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Trying to upgrade items in dirty job, "
                         f"wait a bit")
             await self.auto_purchase_upgrades(http_client, balance, hub_items_owned, game_config_hub_items)
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 3 {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 3 {repr(_ex)}")
 
     async def auto_purchase_upgrades(self, http_client: aiohttp.ClientSession, balance: int, owned_items: dict,
                                      available_items: dict):
@@ -450,8 +450,8 @@ class Tapper:
             else:
                 return False
 
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 5 {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 5 {repr(_ex)}")
 
     async def daily_claim(self, http_client: aiohttp.ClientSession):
         try:
@@ -465,16 +465,16 @@ class Tapper:
             else:
                 return False
 
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while daily reward {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while daily reward {repr(_ex)}")
 
     async def get_tap_passes(self, http_client: aiohttp.ClientSession):
         try:
             response = await http_client.get(url=WebappURLs.GET_TAP_PASSES, ssl=False)
             response_json = await response.json()
             return response_json
-        except Exception as ex_:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while getting tap passes {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while getting tap passes {repr(_ex)}")
 
     async def buy_tap_pass(self, http_client: aiohttp.ClientSession):
         try:
@@ -492,8 +492,8 @@ class Tapper:
             response = await http_client.get(url='https://httpbin.org/ip', timeout=aiohttp.ClientTimeout(45), ssl=False)
             ip = (await response.json()).get('origin')
             logger.info(f"{self.session_name} | Proxy IP: {ip}")
-        except Exception as ex_:
-            logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {repr(ex_)}")
+        except Exception as _ex:
+            logger.error(f"{self.session_name} | Proxy: {proxy} | Error: {repr(_ex)}")
 
     async def run(self, proxy: str | None) -> None:
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
@@ -603,8 +603,8 @@ class Tapper:
             except InvalidSession as error:
                 raise error
 
-            except Exception as error:
-                logger.error(f"{self.session_name} | Unknown error: {error}")
+            except Exception as _ex:
+                logger.error(f"{self.session_name} | Unknown error: {repr(_ex)}")
                 await asyncio.sleep(delay=3)
                 continue
 
