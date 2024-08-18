@@ -523,7 +523,7 @@ class Tapper:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | "
                          f"Error while checking registration status {repr(_ex)}")
 
-async def run(self, proxy: str | None) -> None:
+    async def run(self, proxy: str | None) -> None:
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
 
         http_client = aiohttp.ClientSession(headers=headers,
