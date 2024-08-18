@@ -541,7 +541,7 @@ class Tapper:
 
                 tokens = await self.daily_claim(http_client=http_client)
                 if tokens is not False:
-                    logger.success(f'<light-yellow>{self.session_name}</light-yellow> | Daily claimed: {tokens} AGO')
+                    logger.success(f'<light-yellow>{self.session_name}</light-yellow> | Daily claimed: {tokens:,} AGO')
 
                 if settings.DAILY_CHECKIN:
                     checkin_result = await self.daily_checkin(http_client=http_client)
@@ -560,7 +560,7 @@ class Tapper:
                 if settings.AUTO_TAP:
                     taps = await self.get_taps(http_client=http_client)
                     if taps != 0:
-                        logger.info(f"<light-yellow>{self.session_name}</light-yellow> | You have {taps} taps "
+                        logger.info(f"<light-yellow>{self.session_name}</light-yellow> | You have {taps:,} taps "
                                     f"available, starting clicking, please wait a bit..")
                         status = await self.do_taps(http_client=http_client, taps=taps)
                         if status:
