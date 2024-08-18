@@ -547,7 +547,7 @@ class Tapper:
                     checkin_result = await self.daily_checkin(http_client=http_client)
                     if checkin_result:
                         logger.success(f'<light-yellow>{self.session_name}</light-yellow> | '
-                                       f'Successful Daily checkin! Claimed <g>{checkin_result:,}<g> AGO')
+                                       f'Successful daily in-app checkin! Claimed <g>{checkin_result:,}<g> AGO')
 
                 if settings.AUTO_BUY_PASS:
                     data = await self.get_tap_passes(http_client=http_client)
