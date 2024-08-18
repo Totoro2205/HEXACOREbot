@@ -1,4 +1,5 @@
 import asyncio
+import time
 from urllib.parse import unquote
 
 import aiohttp
@@ -225,13 +226,14 @@ class Tapper:
 
     async def do_taps(self, http_client: aiohttp.ClientSession, taps):
         try:
-            full_cycles = taps // 40
-            remainder = taps % 40
+            full_cycles = taps // 20
+            remainder = taps % 20
 
             for _ in range(full_cycles):
-                json = {"taps": 40}
+                json = {"taps": 20}
                 response = await http_client.post(url=WebappURLs.MINING_COMPLETE, json=json, ssl=False)
                 response_json = await response.json()
+                time.sleep(3)
                 if not response_json.get('success'):
                     return False
 
