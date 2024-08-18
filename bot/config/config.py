@@ -8,6 +8,7 @@ class Settings(BaseSettings):
     API_HASH: str
 
     AUTO_TAP: bool = True
+    DAILY_CHECKIN: bool = True
     AUTO_MISSION: bool = True
     AUTO_LVL_UP: bool = True
     PLAY_WALK_GAME: bool = True

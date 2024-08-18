@@ -460,13 +460,29 @@ class Tapper:
             json = {"user_id": self.user_id}
             response = await http_client.post(url=WebappURLs.DAILY_REWARD, json=json, ssl=False)
             response_json = await response.json()
-
             tokens = response_json.get('tokens')
             if tokens is not None:
                 return tokens
             else:
                 return False
+        except Exception as _ex:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while daily reward {repr(_ex)}")
 
+    async def daily_checkin(self, http_client: aiohttp.ClientSession):
+        try:
+            response = await http_client.get(url=WebappURLs.DAILY_CHECKIN, ssl=False)
+            checkin_json = await response.json()
+            checkin_available = checkin_json.get('is_available')
+            next_level = checkin_json.get('next')
+            if checkin_available == True:
+                json_data = {"day": next_level}
+                response = await http_client.post(url=WebappURLs.DAILY_CHECKIN, json=json_data, ssl=False)
+                if response.status == 200:
+                    response = await http_client.get(url=WebappURLs.DAILY_CHECKIN, ssl=False)
+                    response_json = await response.json()
+                    if not response_json.get('is_available'):
+                        return checkin_json.get('config')[next_level]
+            return False
         except Exception as _ex:
             logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while daily reward {repr(_ex)}")
 
@@ -476,7 +492,8 @@ class Tapper:
             response_json = await response.json()
             return response_json
         except Exception as _ex:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while getting tap passes {repr(_ex)}")
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | Error while getting tap passes {repr(_ex)}")
 
     async def buy_tap_pass(self, http_client: aiohttp.ClientSession):
         try:
@@ -525,6 +542,12 @@ class Tapper:
                 tokens = await self.daily_claim(http_client=http_client)
                 if tokens is not False:
                     logger.success(f'<light-yellow>{self.session_name}</light-yellow> | Daily claimed: {tokens} AGO')
+
+                if settings.DAILY_CHECKIN:
+                    checkin_result = await self.daily_checkin(http_client=http_client)
+                    if checkin_result:
+                        logger.success(f'<light-yellow>{self.session_name}</light-yellow> | '
+                                       f'Daily checkin successfull! Claimed <g>{checkin_result:,}<g> AGO')
 
                 if settings.AUTO_BUY_PASS:
                     data = await self.get_tap_passes(http_client=http_client)
