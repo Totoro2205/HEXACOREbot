@@ -548,11 +548,13 @@ class Tapper:
 
                 info = await self.get_balance(http_client=http_client)
                 balance = info.get("balance") or 0
-                logger.info(f'<light-yellow>{self.session_name}</light-yellow> | Balance: <g>{balance:,}</g> AGO')
+                logger.info(f'<light-yellow>{self.session_name}</light-yellow> | '
+                            f'Balance: <g>{balance:,}</g> AGO')
 
                 tokens = await self.daily_claim(http_client=http_client)
                 if tokens is not False:
-                    logger.success(f'<light-yellow>{self.session_name}</light-yellow> | Daily claimed: <g>{tokens:,}</g> AGO')
+                    logger.success(f'<light-yellow>{self.session_name}</light-yellow> | '
+                                   f'Daily claimed: <g>{tokens:,}</g> AGO')
 
                 if settings.DAILY_CHECKIN:
                     checkin_result = await self.daily_checkin(http_client=http_client)
