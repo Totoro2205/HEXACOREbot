@@ -466,7 +466,7 @@ class Tapper:
             else:
                 return False
         except Exception as _ex:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while daily reward {repr(_ex)}")
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error claiming daily reward {repr(_ex)}")
 
     async def daily_checkin(self, http_client: aiohttp.ClientSession):
         try:
@@ -552,7 +552,7 @@ class Tapper:
 
                 tokens = await self.daily_claim(http_client=http_client)
                 if tokens is not False:
-                    logger.success(f'<light-yellow>{self.session_name}</light-yellow> | Daily claimed: {tokens:,} AGO')
+                    logger.success(f'<light-yellow>{self.session_name}</light-yellow> | Daily claimed: <g>{tokens:,}</g> AGO')
 
                 if settings.DAILY_CHECKIN:
                     checkin_result = await self.daily_checkin(http_client=http_client)
