@@ -12,4 +12,5 @@ headers = {
     "sec-fetch-dest": "empty",
     "sec-fetch-mode": "cors",
     "sec-fetch-site": "same-site",
+    'x-requested-with': 'org.telegram.messenger',
 }

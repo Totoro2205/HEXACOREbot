@@ -16,3 +16,4 @@ class WebappURLs:
     MISSION_COMPLETE = f"{BASE_URL}mission-complete"
     IN_GAME_REWARD_AVAILABLE = f"{BASE_URL}in-game-reward-available"
     IN_GAME_REWARD = f"{BASE_URL}in-game-reward"
+    LEADER_BOARD = f"{BASE_URL}leaderboard/50"

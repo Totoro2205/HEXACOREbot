@@ -266,6 +266,23 @@ class Tapper:
                 f"Error while get balance {repr(_ex)}"
             )
 
+    async def get_leaderboard(self, http_client: aiohttp.ClientSession):
+        try:
+            response = await http_client.get(
+                url=f"{WebappURLs.LEADER_BOARD}", ssl=False
+            )
+            response_json = await response.json()
+            player_rank = response_json.get("player_rank")
+            user_name = player_rank.get("username")
+            tokens = player_rank.get("tokens")
+            rank = player_rank.get("rank")
+            return user_name, rank, tokens
+        except Exception as _ex:
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | "
+                f"Error while get leaderboard {repr(_ex)}"
+            )
+
     async def do_taps(self, http_client: aiohttp.ClientSession, taps):
         try:
             taps_chunk = randint(settings.TAPS_CHUNK[0], settings.TAPS_CHUNK[1])
@@ -340,7 +357,9 @@ class Tapper:
             lvl = response_json.get("lvl")
             upgrade_available = response_json.get("upgrade_available")
             upgrade_price = response_json.get("upgrade_price")
-            return (lvl, upgrade_available, upgrade_price)
+            tap_size = response_json.get("tap")
+            max_taps = response_json.get("taps")
+            return lvl, upgrade_available, upgrade_price, tap_size, max_taps
         except Exception as _ex:
             logger.error(
                 f"<light-yellow>{self.session_name}</light-yellow> | Error while get level {repr(_ex)}"
@@ -697,12 +716,23 @@ class Tapper:
                         )
                     elif status == "registered":
                         pass
-
+                lvl, available, price, tap_size, max_taps = await self.get_level_info(
+                    http_client=http_client
+                )
                 info = await self.get_balance(http_client=http_client)
                 balance = info.get("balance") or 0
                 logger.info(
                     f"<light-yellow>{self.session_name}</light-yellow> | "
-                    f"Balance: <g>{balance:,}</g> AGO"
+                    f"Balance: <g>{balance:,}</g> AGO | Level: <g>{lvl}</g> | "
+                    f"Taps limit: <g>{max_taps:,}</g> | Tap size: <g>{tap_size}</g>"
+                )
+                username, rank, overall_tokens = await self.get_leaderboard(
+                    http_client=http_client
+                )
+                logger.info(
+                    f"<light-yellow>{self.session_name}</light-yellow> | "
+                    f"User <light-yellow>{username}</light-yellow> is on <g>{rank}</g> place on liderboard"
+                    f" with overall balance <g>{overall_tokens:,}</g> AGO"
                 )
 
                 tokens = await self.daily_claim(http_client=http_client)
@@ -762,7 +792,7 @@ class Tapper:
                 if settings.AUTO_LVL_UP:
                     info = await self.get_balance(http_client=http_client)
                     balance = info.get("balance") or 0
-                    lvl, available, price = await self.get_level_info(
+                    lvl, available, price, tap_size, max_taps = await self.get_level_info(
                         http_client=http_client
                     )
                     if available and price <= balance:
