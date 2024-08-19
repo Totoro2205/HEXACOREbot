@@ -299,7 +299,7 @@ class Tapper:
 
         except Exception as _ex:
             logger.error(
-                f"<light-yellow>{self.session_name}</light-yellow> | Error while do taps {repr(_ex)}"
+                f"<light-yellow>{self.session_name}</light-yellow> | Error while tapping {repr(_ex)}"
             )
 
     async def get_missions(self, http_client: aiohttp.ClientSession):
