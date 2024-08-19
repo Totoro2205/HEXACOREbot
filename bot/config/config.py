@@ -8,7 +8,7 @@ class Settings(BaseSettings):
     API_HASH: str
 
     AUTO_TAP: bool = True
-    TAPS_CHUNK: list[int] = [20, 30]
+    TAPS_CHUNK: list[int] = [15, 20]
 
     DAILY_CHECKIN: bool = True
     AUTO_MISSION: bool = True
