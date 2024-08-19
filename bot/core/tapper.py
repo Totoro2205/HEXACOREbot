@@ -171,9 +171,9 @@ class Tapper:
         except InvalidSession as error:
             raise error
 
-        except Exception as error:
+        except Exception as _ex:
             logger.error(
-                f"{self.session_name} | Unknown error during Authorization: {error}"
+                f"{self.session_name} | Unknown error during Authorization: {repr(_ex)}"
             )
             await asyncio.sleep(delay=3)
 
@@ -282,7 +282,7 @@ class Tapper:
                     url=WebappURLs.MINING_COMPLETE, json=json_data, ssl=False
                 )
                 response_json = await response.json()
-                time.sleep(3)
+                time.sleep(2)
                 if not response_json.get("success"):
                     return False
 
