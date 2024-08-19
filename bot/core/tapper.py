@@ -731,7 +731,7 @@ class Tapper:
                 )
                 logger.info(
                     f"<light-yellow>{self.session_name}</light-yellow> | "
-                    f"User <light-yellow>{username}</light-yellow> is on <g>{rank}</g> place on liderboard"
+                    f"User <light-yellow>{username}</light-yellow> is on <g>{rank}</g> place on leaderboard"
                     f" with overall balance <g>{overall_tokens:,}</g> AGO"
                 )
 
@@ -756,7 +756,7 @@ class Tapper:
                         status = await self.buy_tap_pass(http_client=http_client)
                         if status:
                             logger.success(
-                                f"<light-yellow>{self.session_name}</light-yellow> | Bought taps pass for 7 days"
+                                f"<light-yellow>{self.session_name}</light-yellow> | Bought taps pass for <g>7</g> days"
                             )
 
                 if settings.AUTO_TAP:
