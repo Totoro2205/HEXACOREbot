@@ -79,7 +79,9 @@ async def process() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("-a", "--action", type=int, help="Action to perform")
 
-    logger.info(f"Detected {len(get_session_names())} sessions | {len(get_proxies())} proxies")
+    logger.info(
+        f"Detected {len(get_session_names())} sessions | {len(get_proxies())} proxies"
+    )
 
     action = parser.parse_args().action
 
@@ -104,8 +106,6 @@ async def process() -> None:
 
     elif action == 2:
         await register_sessions()
-
-
 
 
 async def run_tasks(tg_clients: list[Client]):

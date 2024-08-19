@@ -8,20 +8,22 @@ class Settings(BaseSettings):
     API_HASH: str
 
     AUTO_TAP: bool = True
+    TAPS_CHUNK: list[int] = [20, 30]
+
     DAILY_CHECKIN: bool = True
     AUTO_MISSION: bool = True
     AUTO_LVL_UP: bool = True
+
     PLAY_WALK_GAME: bool = True
     PLAY_SHOOT_GAME: bool = True
     PLAY_RPG_GAME: bool = True
     PLAY_DIRTY_JOB_GAME: bool = True
+
     AUTO_BUY_PASS: bool = True
 
-    REF_ID: str = ''
+    REF_ID: str = ""
 
     USE_PROXY_FROM_FILE: bool = False
 
 
 settings = Settings()
-
-

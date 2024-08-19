@@ -8,6 +8,6 @@ async def main():
     await process()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     with suppress(KeyboardInterrupt):
         asyncio.run(main())
