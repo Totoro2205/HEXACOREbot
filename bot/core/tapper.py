@@ -602,6 +602,8 @@ class Tapper:
             checkin_json = await response.json()
             checkin_available = checkin_json.get("is_available")
             next_level = checkin_json.get("next")
+            rewards = checkin_json.get("config")
+            reward = rewards.get(f"{next_level}")
             if checkin_available:
                 json_data = {"day": next_level}
                 response = await http_client.post(
@@ -613,7 +615,7 @@ class Tapper:
                     )
                     response_json = await response.json()
                     if not response_json.get("is_available"):
-                        return checkin_json.get("config")[next_level]
+                        return reward
             return False
         except Exception as _ex:
             logger.error(
@@ -715,7 +717,7 @@ class Tapper:
                     if checkin_result:
                         logger.success(
                             f"<light-yellow>{self.session_name}</light-yellow> | "
-                            f"Successful daily in-app checkin! Claimed <g>{checkin_result:,}<g> AGO"
+                            f"Successful daily in-app checkin! Claimed <g>{checkin_result:,}</g> AGO"
                         )
 
                 if settings.AUTO_BUY_PASS:
