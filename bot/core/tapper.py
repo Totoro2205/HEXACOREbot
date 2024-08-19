@@ -826,7 +826,7 @@ class Tapper:
 
             except Exception as _ex:
                 logger.error(f"{self.session_name} | Unknown error: {repr(_ex)}")
-                await asyncio.sleep(delay=3)
+                await asyncio.sleep(delay=10)
                 continue
 
 
