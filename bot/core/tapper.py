@@ -731,7 +731,7 @@ class Tapper:
                     taps = await self.get_taps(http_client=http_client)
                     if taps != 0:
                         logger.info(
-                            f"<light-yellow>{self.session_name}</light-yellow> | You have {taps:,} taps "
+                            f"<light-yellow>{self.session_name}</light-yellow> | You have <g>{taps:,}</g> taps "
                             f"available, starting tapping, please wait a bit.."
                         )
                         status = await self.do_taps(http_client=http_client, taps=taps)
