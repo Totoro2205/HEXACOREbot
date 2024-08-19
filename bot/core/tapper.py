@@ -268,7 +268,7 @@ class Tapper:
 
     async def do_taps(self, http_client: aiohttp.ClientSession, taps):
         try:
-            taps_chunk = randint(settings.TAPS_CHUNK[0], settings.TAPS_CHUNK[1] + 1)
+            taps_chunk = randint(settings.TAPS_CHUNK[0], settings.TAPS_CHUNK[1])
             logger.info(
                 f"<light-yellow>{self.session_name}</light-yellow> | "
                 f"Tapping with <g>{taps_chunk}</g> taps chunks started"
