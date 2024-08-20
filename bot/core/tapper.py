@@ -846,12 +846,12 @@ class Tapper:
                     await self.play_game_3(http_client=http_client)
 
                 logger.info(
-                    f"<light-yellow>{self.session_name}</light-yellow> | Going sleep 1 hour"
+                    f"<light-yellow>{self.session_name}</light-yellow> | Going sleep 30 minutes"
                 )
 
                 http_client.headers["Host"] = "ago-api.hexacore.io"
 
-                await asyncio.sleep(3600)
+                await asyncio.sleep(1800)
 
             except InvalidSession as error:
                 raise error
