@@ -13,6 +13,7 @@ from pyrogram.errors import (
     FloodWait,
 )
 from pyrogram.raw.functions.messages import RequestAppWebView
+from pyrogram.raw.functions.messages import RequestWebView, StartBot
 from pyrogram.raw import types
 from bot.config import settings
 from bot.utils import logger
@@ -33,6 +34,7 @@ class Tapper:
         self.first_name = None
         self.last_name = None
         self.fullname = None
+        self.auth_data = ''
 
         self.session_ug_dict = self.load_user_agents() or []
 
@@ -135,11 +137,21 @@ class Tapper:
             InputBotApp = types.InputBotAppShortName(bot_id=peer, short_name="wallet")
 
             web_view = await self.tg_client.invoke(
-                RequestAppWebView(
+                StartBot(
                     peer=peer,
-                    app=InputBotApp,
+                    bot=peer,
+                    random_id=randint(1000, 9999),
+                    start_param="1717775892732",
+                )
+            )
+
+            web_view = await self.tg_client.invoke(
+                RequestWebView(
+                    peer=peer,
+                    bot=peer,
                     platform="android",
-                    write_allowed=True,
+                    from_bot_menu=False,
+                    url="https://ago-wallet.hexacore.io/",
                 )
             )
 
@@ -179,7 +191,8 @@ class Tapper:
 
     async def auth(self, http_client: aiohttp.ClientSession):
         try:
-            json_data = {"user_id": int(self.user_id), "username": str(self.username)}
+            # json_data = {"user_id": int(self.user_id), "username": str(self.username)}
+            json_data = {"data": self.auth_data}
             response = await http_client.post(
                 url=WebappURLs.APP_AUTH, json=json_data, ssl=False
             )
@@ -600,7 +613,8 @@ class Tapper:
 
     async def daily_claim(self, http_client: aiohttp.ClientSession):
         try:
-            json_data = {"user_id": self.user_id}
+            json_data = {"data": self.auth_data}
+            # json_data = {"user_id": self.user_id}
             response = await http_client.post(
                 url=WebappURLs.DAILY_REWARD, json=json_data, ssl=False
             )
@@ -622,7 +636,7 @@ class Tapper:
             checkin_available = checkin_json.get("is_available")
             next_level = checkin_json.get("next")
             rewards = checkin_json.get("config")
-            reward = rewards.get(f"{next_level}")
+            reward = int(rewards.get(f"{next_level}"))
             if checkin_available:
                 json_data = {"day": next_level}
                 response = await http_client.post(
@@ -699,23 +713,28 @@ class Tapper:
         if proxy:
             await self.check_proxy(http_client=http_client, proxy=proxy)
 
-        await self.get_tg_web_data(proxy=proxy)
+        self.auth_data = await self.get_tg_web_data(proxy=proxy)
+
+        if not self.auth_data:
+            return
 
         http_client.headers["Authorization"] = await self.auth(http_client=http_client)
+
         while True:
             try:
                 registration_status = await self.check_user_exists(
                     http_client=http_client
                 )
-                if not registration_status:
-                    status = await self.register(http_client=http_client)
-                    if status is True:
-                        logger.success(
-                            f"<light-yellow>{self.session_name}</light-yellow> | "
-                            f"Account was successfully registered!"
-                        )
-                    elif status == "registered":
-                        pass
+
+                # if not registration_status:
+                #     status = await self.register(http_client=http_client)
+                #     if status is True:
+                #         logger.success(
+                #             f"<light-yellow>{self.session_name}</light-yellow> | "
+                #             f"Account was successfully registered!"
+                #         )
+                #     elif status == "registered":
+                #         pass
                 lvl, available, price, tap_size, max_taps = await self.get_level_info(
                     http_client=http_client
                 )
@@ -735,12 +754,13 @@ class Tapper:
                     f" with overall balance <g>{overall_tokens:,}</g> AGO"
                 )
 
-                tokens = await self.daily_claim(http_client=http_client)
-                if tokens is not False:
-                    logger.success(
-                        f"<light-yellow>{self.session_name}</light-yellow> | "
-                        f"Daily claimed: <g>{tokens:,}</g> AGO"
-                    )
+                if settings.DAILY_REWARD:
+                    tokens = await self.daily_claim(http_client=http_client)
+                    if tokens is not False:
+                        logger.success(
+                            f"<light-yellow>{self.session_name}</light-yellow> | "
+                            f"Daily claimed: <g>{tokens:,}</g> AGO"
+                        )
 
                 if settings.DAILY_CHECKIN:
                     checkin_result = await self.daily_checkin(http_client=http_client)
@@ -792,8 +812,8 @@ class Tapper:
                 if settings.AUTO_LVL_UP:
                     info = await self.get_balance(http_client=http_client)
                     balance = info.get("balance") or 0
-                    lvl, available, price, tap_size, max_taps = await self.get_level_info(
-                        http_client=http_client
+                    lvl, available, price, tap_size, max_taps = (
+                        await self.get_level_info(http_client=http_client)
                     )
                     if available and price <= balance:
                         status = await self.level_up(http_client=http_client)
