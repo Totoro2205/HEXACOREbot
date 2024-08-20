@@ -23,6 +23,7 @@ from urllib.parse import unquote
 from .agents import generate_random_user_agent
 from .headers import headers
 from .webapp import WebappURLs
+from .helper import format_duration
 
 
 class Tapper:
@@ -34,7 +35,7 @@ class Tapper:
         self.first_name = None
         self.last_name = None
         self.fullname = None
-        self.auth_data = ''
+        self.auth_data = ""
 
         self.session_ug_dict = self.load_user_agents() or []
 
@@ -652,7 +653,7 @@ class Tapper:
             return False
         except Exception as _ex:
             logger.error(
-                f"<light-yellow>{self.session_name}</light-yellow> | Error while daily reward {repr(_ex)}"
+                f"<light-yellow>{self.session_name}</light-yellow> | Error claiming daily reward {repr(_ex)}"
             )
 
     async def get_tap_passes(self, http_client: aiohttp.ClientSession):
@@ -735,6 +736,7 @@ class Tapper:
                 #         )
                 #     elif status == "registered":
                 #         pass
+
                 lvl, available, price, tap_size, max_taps = await self.get_level_info(
                     http_client=http_client
                 )
@@ -865,13 +867,13 @@ class Tapper:
                 if settings.PLAY_DIRTY_JOB_GAME:
                     await self.play_game_3(http_client=http_client)
 
-                logger.info(
-                    f"<light-yellow>{self.session_name}</light-yellow> | Going sleep 30 minutes"
-                )
-
                 http_client.headers["Host"] = "ago-api.hexacore.io"
 
-                await asyncio.sleep(1800)
+                sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
+                logger.info(
+                    f"<light-yellow>{self.session_name}</light-yellow> | Going sleep {format_duration(sleep_seconds)}"
+                )
+                await asyncio.sleep(sleep_seconds)
 
             except InvalidSession as error:
                 raise error
