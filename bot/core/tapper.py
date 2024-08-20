@@ -297,6 +297,25 @@ class Tapper:
                 f"Error while get leaderboard {repr(_ex)}"
             )
 
+    async def get_referral_activity(self, http_client: aiohttp.ClientSession):
+        try:
+            response = await http_client.get(
+                url=f"{WebappURLs.REFERRAL_ACTIVITY}", ssl=False
+            )
+            response_json = await response.json()
+            referrals_activity = response_json.get("referrals_activity")
+            for referral in referrals_activity:
+                logger.info(
+                    f"<light-yellow>{self.session_name}</light-yellow> | "
+                    f"Bonus <g>{referral['bonus']:,}</g> "
+                    f"from referral <light-yellow>{referral['username']}</light-yellow>"
+                )
+        except Exception as _ex:
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | "
+                f"Error while getting referrals activity {repr(_ex)}"
+            )
+
     async def do_taps(self, http_client: aiohttp.ClientSession, taps):
         try:
             taps_chunk = randint(settings.TAPS_CHUNK[0], settings.TAPS_CHUNK[1])
@@ -755,6 +774,8 @@ class Tapper:
                     f"User <light-yellow>{username}</light-yellow> is on <g>{rank}</g> place on leaderboard"
                     f" with overall balance <g>{overall_tokens:,}</g> AGO"
                 )
+
+                await self.get_referral_activity(http_client=http_client)
 
                 if settings.DAILY_REWARD:
                     tokens = await self.daily_claim(http_client=http_client)
