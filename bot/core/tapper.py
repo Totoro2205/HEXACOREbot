@@ -967,7 +967,6 @@ class Tapper:
 
 
 async def run_tapper(tg_client: Client, proxy: str | None):
-    while:
     try:
         await Tapper(tg_client=tg_client).run(proxy=proxy)
     except InvalidSession:
