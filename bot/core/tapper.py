@@ -35,7 +35,8 @@ class Tapper:
         self.first_name = None
         self.last_name = None
         self.fullname = None
-        self.auth_data = ""
+        self.auth_data = None
+        self.errors: int = 0
 
         self.session_ug_dict = self.load_user_agents() or []
 
@@ -942,11 +943,16 @@ class Tapper:
                     f"<light-yellow>{self.session_name}</light-yellow> | Going sleep {format_duration(sleep_seconds)}"
                 )
                 await asyncio.sleep(sleep_seconds)
+                # await self.auth(http_client=http_client)
 
             except InvalidSession as error:
                 raise error
 
             except Exception as _ex:
+                self.errors += 1
+                if self.errors >= settings.MAX_ERRORS:
+                    logger.critical(f"{self.session_name} | Too many errors! {self.errors}! Bot Stopped")
+                    return
                 logger.error(f"{self.session_name} | Unknown error: {repr(_ex)}")
                 await asyncio.sleep(delay=10)
                 continue
