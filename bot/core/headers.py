@@ -1,4 +1,5 @@
 headers = {
+    'authority': 'ago-api.hexacore.io',
     "accept": "*/*",
     "accept-language": "ru-UA,ru;q=0.9,en-US;q=0.8,en;q=0.7,uk-UA;q=0.6,uk;q=0.5",
     "cache-control": "no-cache",

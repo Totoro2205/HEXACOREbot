@@ -478,8 +478,7 @@ class Tapper:
             response_json = await response.json()
 
             level = response_json.get("playerState").get("currentGameLevel")
-            games_count = len(response_json.get('gameConfig').get('gameLevels', {}))
-
+            games_count = len(response_json.get("gameConfig").get("gameLevels", {}))
 
             for i in range(level + 1, games_count):
                 json_data = {
@@ -526,7 +525,9 @@ class Tapper:
             await self.auto_purchase_upgrades(
                 http_client, balance, hub_items_owned, game_config_hub_items
             )
+            http_client.headers["Host"] = "ago-api.hexacore.io"
         except Exception as _ex:
+            http_client.headers["Host"] = "ago-api.hexacore.io"
             logger.error(
                 f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 3 {repr(_ex)}"
             )
@@ -646,35 +647,52 @@ class Tapper:
 
     async def play_game_6(self, http_client: aiohttp.ClientSession):
         try:
-            response = await http_client.get(url=f'https://hurt-me-please-server.hexacore.io/game/start?playerId='
-                                                 f'{self.user_id}', ssl=False)
+            response = await http_client.get(
+                url=f"https://hurt-me-please-server.hexacore.io/game/start?playerId="
+                f"{self.user_id}",
+                ssl=False,
+            )
             response.raise_for_status()
             response_json = await response.json()
 
-            level = response_json.get('playerState').get('currentGameLevel')
+            level = response_json.get("playerState").get("currentGameLevel")
 
-            games_count = len(response_json.get('gameConfig').get('gameLevels', {}))
+            games_count = len(response_json.get("gameConfig").get("gameLevels", {}))
 
             for i in range(level + 1, games_count):
-                json_data = {"type": "EndGameLevelEvent", "level": i, "agoClaimed": 100, "boosted": False,
-                        "transactionId": None}
-                response1 = await http_client.post(url=f'https://hurt-me-please-server.hexacore.io/game/event',
-                                                   json=json_data, ssl=False)
+                json_data = {
+                    "type": "EndGameLevelEvent",
+                    "level": i,
+                    "agoClaimed": 100,
+                    "boosted": False,
+                    "transactionId": None,
+                }
+                response1 = await http_client.post(
+                    url=f"https://hurt-me-please-server.hexacore.io/game/event",
+                    json=json_data,
+                    ssl=False,
+                )
 
                 if response1.status in (200, 201):
-                    logger.success(f"<light-yellow>{self.session_name}</light-yellow> | "
-                                   f"Done <g>{i}</g> lvl in Hurt me please")
+                    logger.success(
+                        f"<light-yellow>{self.session_name}</light-yellow> | "
+                        f"Done <g>{i}</g> lvl in Hurt me please"
+                    )
 
                 elif response1.status == 400:
-                    logger.warning(f"<light-yellow>{self.session_name}</light-yellow> | "
-                                   f"Reached max games for today in Hurt me please")
+                    logger.warning(
+                        f"<light-yellow>{self.session_name}</light-yellow> | "
+                        f"Reached max games for today in Hurt me please"
+                    )
                     break
 
                 await asyncio.sleep(1)
 
         except Exception as error:
-            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game Hurt me please"
-                         f" {error}")
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | Error while play game Hurt me please"
+                f" {error}"
+            )
 
     async def daily_claim(self, http_client: aiohttp.ClientSession):
         try:
@@ -743,7 +761,7 @@ class Tapper:
             return True
         except Exception as error:
             logger.error(
-                f"<light-yellow>{self.session_name}</light-yellow> | Error while getting tap passes {error}"
+                f"<light-yellow>{self.session_name}</light-yellow> | Error while getting tap pass {error}"
             )
 
     async def check_proxy(
@@ -771,11 +789,27 @@ class Tapper:
                 f"Error while checking registration status {repr(_ex)}"
             )
 
+    async def get_active_stakes(self, http_client: aiohttp.ClientSession):
+        try:
+            response = await http_client.get(url=WebappURLs.ACTIVE_STAKES, ssl=False)
+            response_json = await response.json()
+            return response_json.get("active_stakes") if response_json.get("success") else None
+        except Exception as _ex:
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | "
+                f"Error while getting active stakes {repr(_ex)}"
+            )
+
     async def run(self, proxy: str | None) -> None:
 
         if settings.USE_RANDOM_DELAY_IN_RUN:
-            random_delay = randint(settings.RANDOM_DELAY_IN_RUN[0], settings.RANDOM_DELAY_IN_RUN[1])
-            logger.info(f"<light-yellow>{self.tg_client.name}</light-yellow> | Run after <lw>{random_delay}s</lw>")
+            random_delay = randint(
+                settings.RANDOM_DELAY_IN_RUN[0], settings.RANDOM_DELAY_IN_RUN[1]
+            )
+            logger.info(
+                f"<light-yellow>{self.tg_client.name}</light-yellow> | "
+                f"Run after <lw>{random_delay}s</lw>"
+            )
             await asyncio.sleep(delay=random_delay)
 
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
@@ -848,7 +882,8 @@ class Tapper:
 
                 if settings.AUTO_BUY_PASS:
                     data = await self.get_tap_passes(http_client=http_client)
-                    if data.get("active_tap_pass") is None and balance >= 1000:
+                    price_7_days = int(data.get("tap_passes")["7_days"]["user_cost"])
+                    if data.get("active_tap_pass") is None and balance >= price_7_days:
                         status = await self.buy_tap_pass(http_client=http_client)
                         if status:
                             logger.success(
@@ -944,6 +979,18 @@ class Tapper:
                 if settings.PLAY_HURTMEPLEASE_GAME:
                     await self.play_game_6(http_client=http_client)
 
+                http_client.headers["Host"] = "ago-api.hexacore.io"
+
+                if settings.MIN_LVL_TO_STAKE >= lvl:
+                    info = await self.get_balance(http_client=http_client)
+                    balance = info.get("balance") or 0
+                    coins_to_stake = balance - settings.BALANCE_TO_SAVE
+                    active_stakes = await self.get_active_stakes(http_client=http_client)
+                    if active_stakes is not None:
+
+                        if coins_to_stake > 1_000:
+                            pass
+
                 sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
                 logger.info(
                     f"<light-yellow>{self.session_name}</light-yellow> | Going sleep {format_duration(sleep_seconds)}"
@@ -958,9 +1005,13 @@ class Tapper:
                 self.errors += 1
                 if self.errors >= settings.MAX_ERRORS:
                     # await http_client.close()
-                    logger.critical(f"{self.session_name} | Too many errors! {self.errors}! Relogin")
+                    logger.critical(
+                        f"{self.session_name} | Too many errors! {self.errors}! Relogin"
+                    )
                     self.errors = 0
-                    http_client.headers["Authorization"] = await self.auth(http_client=http_client)
+                    http_client.headers["Authorization"] = await self.auth(
+                        http_client=http_client
+                    )
                 logger.error(f"{self.session_name} | Unknown error: {repr(_ex)}")
                 await asyncio.sleep(delay=10)
                 continue

@@ -29,6 +29,9 @@ class Settings(BaseSettings):
     USE_RANDOM_DELAY_IN_RUN: bool = True
     RANDOM_DELAY_IN_RUN: list[int] = [0, 20]
 
+    BALANCE_TO_SAVE: int = 10_000
+    MIN_LVL_TO_STAKE: int = 30
+
     REF_ID: str = ""
 
     USE_PROXY_FROM_FILE: bool = False

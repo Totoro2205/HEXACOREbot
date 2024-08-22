@@ -18,3 +18,7 @@ class WebappURLs:
     IN_GAME_REWARD = f"{BASE_URL}in-game-reward"
     LEADER_BOARD = f"{BASE_URL}leaderboard/50"
     REFERRAL_ACTIVITY = f"{BASE_URL}referral-activity"
+    ACTIVE_STAKES = f"{BASE_URL}staking/active"
+    STAKE = f"{BASE_URL}staking/stake"
+    ADD_STAKE = f"{BASE_URL}staking/add-base"
+    UNSTAKE = f"{BASE_URL}staking/unstake"
