@@ -951,6 +951,7 @@ class Tapper:
             except Exception as _ex:
                 self.errors += 1
                 if self.errors >= settings.MAX_ERRORS:
+                    await http_client.close()
                     logger.critical(f"{self.session_name} | Too many errors! {self.errors}! Bot Stopped")
                     return
                 logger.error(f"{self.session_name} | Unknown error: {repr(_ex)}")

@@ -31,7 +31,7 @@ class Settings(BaseSettings):
 
     USE_PROXY_FROM_FILE: bool = False
 
-    MAX_ERRORS: int = 10
+    MAX_ERRORS: int = 20
 
 
 settings = Settings()
