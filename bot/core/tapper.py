@@ -791,11 +791,49 @@ class Tapper:
         try:
             response = await http_client.get(url=WebappURLs.ACTIVE_STAKES, ssl=False)
             response_json = await response.json()
-            return response_json.get("active_stakes") if response_json.get("success") else None
+            return (
+                response_json.get("active_stakes")
+                if response_json.get("success")
+                else None
+            )
         except Exception as _ex:
             logger.error(
                 f"<light-yellow>{self.session_name}</light-yellow> | "
                 f"Error while getting active stakes {repr(_ex)}"
+            )
+
+    async def stake(self, http_client: aiohttp.ClientSession, amount):
+        try:
+            json_data = {
+                "type": "week",
+                "amount": amount,
+            }
+            response = await http_client.post(
+                url=WebappURLs.STAKE, json=json_data, ssl=False
+            )
+            response_json = await response.json()
+            return response_json.get("success")
+        except Exception as _ex:
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | "
+                f"Error while stake {repr(_ex)}"
+            )
+
+    async def add_stake(self, http_client: aiohttp.ClientSession, amount):
+        try:
+            json_data = {
+                "type": "week",
+                "amount": amount,
+            }
+            response = await http_client.post(
+                url=WebappURLs.ADD_STAKE, json=json_data, ssl=False
+            )
+            response_json = await response.json()
+            return response_json.get("success")
+        except Exception as _ex:
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | "
+                f"Error while adding stake base {repr(_ex)}"
             )
 
     async def run(self, proxy: str | None) -> None:
@@ -979,15 +1017,35 @@ class Tapper:
 
                 http_client.headers["Host"] = "ago-api.hexacore.io"
 
-                if settings.MIN_LVL_TO_STAKE >= lvl:
-                    info = await self.get_balance(http_client=http_client)
-                    balance = info.get("balance") or 0
-                    coins_to_stake = balance - settings.BALANCE_TO_SAVE
-                    active_stakes = await self.get_active_stakes(http_client=http_client)
-                    if active_stakes is not None:
-
+                if settings.AUTO_STAKING:
+                    if settings.MIN_LVL_TO_STAKE >= lvl:
+                        info = await self.get_balance(http_client=http_client)
+                        balance = info.get("balance") or 0
+                        coins_to_stake = balance - settings.BALANCE_TO_SAVE
                         if coins_to_stake > 1_000:
-                            pass
+                            active_stakes = await self.get_active_stakes(
+                                http_client=http_client
+                            )
+                            if active_stakes is not None:
+                                if not active_stakes:
+                                    if await self.stake(
+                                        http_client=http_client, amount=coins_to_stake
+                                    ):
+                                        logger.success(
+                                            f"<light-yellow>{self.session_name}</light-yellow> | "
+                                            f"Successfully staked <g>{coins_to_stake}</g> AGO for a week"
+                                        )
+                                else:
+                                    for stake in active_stakes:
+                                        if stake["active"] and stake["type"] == "week":
+                                            if await self.add_stake(
+                                                http_client=http_client,
+                                                amount=coins_to_stake,
+                                            ):
+                                                logger.success(
+                                                    f"<light-yellow>{self.session_name}</light-yellow> | "
+                                                    f"Successfully added <g>{coins_to_stake}</g> AGO to stake for a week"
+                                                )
 
                 sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
                 logger.info(
