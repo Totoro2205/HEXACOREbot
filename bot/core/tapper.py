@@ -655,10 +655,10 @@ class Tapper:
             games_count = len(response_json.get('gameConfig').get('gameLevels', {}))
 
             for i in range(level + 1, games_count):
-                json = {"type": "EndGameLevelEvent", "level": i, "agoClaimed": 100, "boosted": False,
+                json_data = {"type": "EndGameLevelEvent", "level": i, "agoClaimed": 100, "boosted": False,
                         "transactionId": None}
                 response1 = await http_client.post(url=f'https://hurt-me-please-server.hexacore.io/game/event',
-                                                   json=json, ssl=False)
+                                                   json=json_data, ssl=False)
 
                 if response1.status in (200, 201):
                     logger.success(f"<light-yellow>{self.session_name}</light-yellow> | "
