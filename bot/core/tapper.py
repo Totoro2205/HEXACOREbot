@@ -661,11 +661,12 @@ class Tapper:
                                                    json=json, ssl=False)
 
                 if response1.status in (200, 201):
-                    logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Done {i} lvl in Hurt me please")
+                    logger.success(f"<light-yellow>{self.session_name}</light-yellow> | "
+                                   f"Done <g>{i}</g> lvl in Hurt me please")
 
                 elif response1.status == 400:
-                    logger.warning(f"<light-yellow>{self.session_name}</light-yellow> | Reached max games for today in "
-                                   f"Hurt me please")
+                    logger.warning(f"<light-yellow>{self.session_name}</light-yellow> | "
+                                   f"Reached max games for today in Hurt me please")
                     break
 
                 await asyncio.sleep(1)
