@@ -26,7 +26,8 @@ class Settings(BaseSettings):
     AUTO_BUY_PASS: bool = True
 
     SLEEP_TIME: list[int] = [3000, 3600]
-    USE_RANDOM_DELAY_IN_RUN: list[int] = [0, 15]
+    USE_RANDOM_DELAY_IN_RUN: bool = True
+    RANDOM_DELAY_IN_RUN: list[int] = [0, 15]
 
     REF_ID: str = ""
 
