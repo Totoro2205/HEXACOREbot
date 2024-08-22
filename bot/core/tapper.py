@@ -776,6 +776,7 @@ class Tapper:
         if settings.USE_RANDOM_DELAY_IN_RUN:
             random_delay = randint(settings.RANDOM_DELAY_IN_RUN[0], settings.RANDOM_DELAY_IN_RUN[1])
             logger.info(f"{self.tg_client.name} | Run for <lw>{random_delay}s</lw>")
+            await asyncio.sleep(delay=random_delay)
 
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
 
