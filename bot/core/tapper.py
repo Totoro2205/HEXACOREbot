@@ -958,15 +958,16 @@ class Tapper:
                 self.errors += 1
                 if self.errors >= settings.MAX_ERRORS:
                     await http_client.close()
-                    logger.critical(f"{self.session_name} | Too many errors! {self.errors}! Bot Reloaded")
+                    logger.critical(f"{self.session_name} | Too many errors! {self.errors}! Relogin")
                     self.errors = 0
-                    await self.run()
+                    http_client.headers["Authorization"] = await self.auth(http_client=http_client)
                 logger.error(f"{self.session_name} | Unknown error: {repr(_ex)}")
                 await asyncio.sleep(delay=10)
                 continue
 
 
 async def run_tapper(tg_client: Client, proxy: str | None):
+    while:
     try:
         await Tapper(tg_client=tg_client).run(proxy=proxy)
     except InvalidSession:
