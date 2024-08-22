@@ -957,7 +957,7 @@ class Tapper:
             except Exception as _ex:
                 self.errors += 1
                 if self.errors >= settings.MAX_ERRORS:
-                    await http_client.close()
+                    # await http_client.close()
                     logger.critical(f"{self.session_name} | Too many errors! {self.errors}! Relogin")
                     self.errors = 0
                     http_client.headers["Authorization"] = await self.auth(http_client=http_client)
