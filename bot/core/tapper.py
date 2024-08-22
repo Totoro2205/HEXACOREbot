@@ -525,9 +525,7 @@ class Tapper:
             await self.auto_purchase_upgrades(
                 http_client, balance, hub_items_owned, game_config_hub_items
             )
-            http_client.headers["Host"] = "ago-api.hexacore.io"
         except Exception as _ex:
-            http_client.headers["Host"] = "ago-api.hexacore.io"
             logger.error(
                 f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 3 {repr(_ex)}"
             )
