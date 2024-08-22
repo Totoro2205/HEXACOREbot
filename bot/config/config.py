@@ -10,6 +10,8 @@ class Settings(BaseSettings):
     AUTO_TAP: bool = True
     TAPS_CHUNK: list[int] = [15, 20]
 
+    GET_REFERRALS_ACTIVITY: bool = False
+
     DAILY_REWARD: bool = False
     DAILY_CHECKIN: bool = True
     AUTO_MISSION: bool = True

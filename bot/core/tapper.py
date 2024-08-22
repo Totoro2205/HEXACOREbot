@@ -820,7 +820,8 @@ class Tapper:
                     f" with overall balance <g>{overall_tokens:,}</g> AGO"
                 )
 
-                await self.get_referral_activity(http_client=http_client)
+                if settings.GET_REFERRALS_ACTIVITY:
+                    await self.get_referral_activity(http_client=http_client)
 
                 if settings.DAILY_REWARD:
                     tokens = await self.daily_claim(http_client=http_client)
