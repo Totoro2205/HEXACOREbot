@@ -26,12 +26,13 @@ class Settings(BaseSettings):
     AUTO_BUY_PASS: bool = True
 
     SLEEP_TIME: list[int] = [3000, 3600]
+    USE_RANDOM_DELAY_IN_RUN: list[int] = [0, 15]
 
     REF_ID: str = ""
 
     USE_PROXY_FROM_FILE: bool = False
 
-    MAX_ERRORS: int = 20
+    MAX_ERRORS: int = 5
 
 
 settings = Settings()

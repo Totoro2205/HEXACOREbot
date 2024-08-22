@@ -772,6 +772,11 @@ class Tapper:
             )
 
     async def run(self, proxy: str | None) -> None:
+
+        if settings.USE_RANDOM_DELAY_IN_RUN:
+            random_delay = randint(settings.RANDOM_DELAY_IN_RUN[0], settings.RANDOM_DELAY_IN_RUN[1])
+            logger.info(f"{self.tg_client.name} | Run for <lw>{random_delay}s</lw>")
+
         proxy_conn = ProxyConnector().from_url(proxy) if proxy else None
 
         http_client = aiohttp.ClientSession(headers=headers, connector=proxy_conn)
@@ -952,8 +957,9 @@ class Tapper:
                 self.errors += 1
                 if self.errors >= settings.MAX_ERRORS:
                     await http_client.close()
-                    logger.critical(f"{self.session_name} | Too many errors! {self.errors}! Bot Stopped")
-                    return
+                    logger.critical(f"{self.session_name} | Too many errors! {self.errors}! Bot Reloaded")
+                    self.errors = 0
+                    await self.run()
                 logger.error(f"{self.session_name} | Unknown error: {repr(_ex)}")
                 await asyncio.sleep(delay=10)
                 continue
