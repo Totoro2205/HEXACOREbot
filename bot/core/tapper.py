@@ -135,7 +135,17 @@ class Tapper:
 
                     await asyncio.sleep(fls + 3)
 
-            InputBotApp = types.InputBotAppShortName(bot_id=peer, short_name="wallet")
+            # InputBotApp = types.InputBotAppShortName(bot_id=peer, short_name="wallet")
+            #
+            # web_view = await self.tg_client.invoke(
+            #     RequestAppWebView(
+            #         peer=peer,
+            #         app=InputBotApp,
+            #         platform="android",
+            #         write_allowed=True,
+            #         start_param="1717475892732"
+            #     )
+            # )
 
             web_view = await self.tg_client.invoke(
                 StartBot(
@@ -467,8 +477,10 @@ class Tapper:
             response_json = await response.json()
 
             level = response_json.get("playerState").get("currentGameLevel")
+            games_count = len(response_json.get('gameConfig').get('gameLevels', {}))
 
-            for i in range(level + 1, 173):
+
+            for i in range(level + 1, games_count):
                 json_data = {
                     "type": "EndGameLevelEvent",
                     "playerId": self.user_id,
@@ -631,10 +643,42 @@ class Tapper:
                 f"<light-yellow>{self.session_name}</light-yellow> | Error while play game 5 {repr(_ex)}"
             )
 
+    async def play_game_6(self, http_client: aiohttp.ClientSession):
+        try:
+            response = await http_client.get(url=f'https://hurt-me-please-server.hexacore.io/game/start?playerId='
+                                                 f'{self.user_id}', ssl=False)
+            response.raise_for_status()
+            response_json = await response.json()
+
+            level = response_json.get('playerState').get('currentGameLevel')
+
+            games_count = len(response_json.get('gameConfig').get('gameLevels', {}))
+
+            for i in range(level + 1, games_count):
+                json = {"type": "EndGameLevelEvent", "level": i, "agoClaimed": 100, "boosted": False,
+                        "transactionId": None}
+                response1 = await http_client.post(url=f'https://hurt-me-please-server.hexacore.io/game/event',
+                                                   json=json, ssl=False)
+
+                if response1.status in (200, 201):
+                    logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Done {i} lvl in Hurt me please")
+
+                elif response1.status == 400:
+                    logger.warning(f"<light-yellow>{self.session_name}</light-yellow> | Reached max games for today in "
+                                   f"Hurt me please")
+                    break
+
+                await asyncio.sleep(1)
+
+        except Exception as error:
+            logger.error(f"<light-yellow>{self.session_name}</light-yellow> | Error while play game Hurt me please"
+                         f" {error}")
+
     async def daily_claim(self, http_client: aiohttp.ClientSession):
         try:
-            json_data = {"data": self.auth_data}
-            # json_data = {"user_id": self.user_id}
+            # json_data = {"data": self.auth_data}
+            json_data = {"user_id": self.user_id}
+
             response = await http_client.post(
                 url=WebappURLs.DAILY_REWARD, json=json_data, ssl=False
             )
@@ -888,7 +932,8 @@ class Tapper:
                 if settings.PLAY_DIRTY_JOB_GAME:
                     await self.play_game_3(http_client=http_client)
 
-                http_client.headers["Host"] = "ago-api.hexacore.io"
+                if settings.PLAY_HURTMEPLEASE_GAME:
+                    await self.play_game_6(http_client=http_client)
 
                 sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
                 logger.info(
