@@ -888,7 +888,8 @@ class Tapper:
                 )
                 logger.info(
                     f"<light-yellow>{self.session_name}</light-yellow> | "
-                    f"Balance: <g>{balance:,}</g> AGO | Level: <g>{lvl}</g> | Place on leaderboard: <g>{rank}</g> | "
+                    f"Balance: <g>{balance:,} ({overall_tokens:,})</g> AGO | "
+                    f"Level: <g>{lvl}</g> | Place on leaderboard: <g>{rank}</g> | "
                     f"Taps limit: <g>{max_taps:,}</g> | Tap size: <g>{tap_size}</g>"
                 )
 
