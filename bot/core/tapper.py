@@ -1021,11 +1021,12 @@ class Tapper:
 
                 if settings.AUTO_STAKING:
                     active_stakes = await self.get_active_stakes(http_client=http_client)
+
                     # TODO Gather stakes
 
+                    info = await self.get_balance(http_client=http_client)
+                    balance = info.get("balance") or 0
                     if settings.MIN_LVL_TO_STAKE <= lvl:
-                        info = await self.get_balance(http_client=http_client)
-                        balance = info.get("balance") or 0
                         coins_to_stake = balance - settings.BALANCE_TO_SAVE
                         if coins_to_stake > 1_000:
                             active_stakes = await self.get_active_stakes(

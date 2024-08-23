@@ -30,7 +30,7 @@ class Settings(BaseSettings):
     RANDOM_DELAY_IN_RUN: list[int] = [0, 20]
 
     AUTO_STAKING: bool = True
-    BALANCE_TO_SAVE: int = 5_000
+    BALANCE_TO_SAVE: int = 10_000
     MIN_LVL_TO_STAKE: int = 25
 
     REF_ID: str = ""
