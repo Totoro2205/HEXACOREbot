@@ -1030,22 +1030,23 @@ class Tapper:
                     balance = info.get("balance") or 0
                     if settings.MIN_LVL_TO_STAKE <= lvl:
                         coins_to_stake = ((balance - settings.BALANCE_TO_SAVE) // 100) * 100
-                        active_stakes = await self.get_active_stakes(http_client=http_client)
-                        if active_stakes is not None:
-                            if not active_stakes:
-                                if await self.stake(http_client=http_client, amount=coins_to_stake):
-                                    logger.success(
-                                        f"<light-yellow>{self.session_name}</light-yellow> | "
-                                        f"Successfully staked <g>{coins_to_stake}</g> AGO for a week"
-                                    )
-                            else:
-                                for stake in active_stakes:
-                                    if stake["active"] and stake["type"] == "week":
-                                        if await self.add_stake(http_client=http_client, amount=coins_to_stake):
-                                            logger.success(
-                                                f"<light-yellow>{self.session_name}</light-yellow> | "
-                                                f"Successfully added <g>{coins_to_stake}</g> AGO to stake for a week"
-                                            )
+                        if coins_to_stake >= settings.MIN_STAKE:
+                            active_stakes = await self.get_active_stakes(http_client=http_client)
+                            if active_stakes is not None:
+                                if not active_stakes:
+                                    if await self.stake(http_client=http_client, amount=coins_to_stake):
+                                        logger.success(
+                                            f"<light-yellow>{self.session_name}</light-yellow> | "
+                                            f"Successfully staked <g>{coins_to_stake}</g> AGO for a week"
+                                        )
+                                else:
+                                    for stake in active_stakes:
+                                        if stake["active"] and stake["type"] == "week":
+                                            if await self.add_stake(http_client=http_client, amount=coins_to_stake):
+                                                logger.success(
+                                                    f"<light-yellow>{self.session_name}</light-yellow> | "
+                                                    f"Successfully added <g>{coins_to_stake}</g> AGO to stake for a week"
+                                                )
 
                 sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
                 logger.info(

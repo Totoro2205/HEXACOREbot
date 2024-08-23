@@ -32,6 +32,7 @@ class Settings(BaseSettings):
     AUTO_STAKING: bool = True
     BALANCE_TO_SAVE: int = 10_000
     MIN_LVL_TO_STAKE: int = 25
+    MIN_STAKE: int = 200
 
     REF_ID: str = ""
 
