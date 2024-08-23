@@ -1021,6 +1021,8 @@ class Tapper:
 
                 if settings.AUTO_STAKING:
                     active_stakes = await self.get_active_stakes(http_client=http_client)
+                    for stake in active_stakes:
+                        pass
 
                     # TODO Gather stakes
 
