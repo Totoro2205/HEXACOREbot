@@ -1029,14 +1029,10 @@ class Tapper:
                     if settings.MIN_LVL_TO_STAKE <= lvl:
                         coins_to_stake = balance - settings.BALANCE_TO_SAVE
                         if coins_to_stake > 1_000:
-                            active_stakes = await self.get_active_stakes(
-                                http_client=http_client
-                            )
+                            active_stakes = await self.get_active_stakes(http_client=http_client)
                             if active_stakes is not None:
                                 if not active_stakes:
-                                    if await self.stake(
-                                        http_client=http_client, amount=coins_to_stake
-                                    ):
+                                    if await self.stake(http_client=http_client, amount=coins_to_stake):
                                         logger.success(
                                             f"<light-yellow>{self.session_name}</light-yellow> | "
                                             f"Successfully staked <g>{coins_to_stake}</g> AGO for a week"
