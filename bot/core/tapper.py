@@ -1042,10 +1042,7 @@ class Tapper:
                                 else:
                                     for stake in active_stakes:
                                         if stake["active"] and stake["type"] == "week":
-                                            if await self.add_stake(
-                                                http_client=http_client,
-                                                amount=coins_to_stake,
-                                            ):
+                                            if await self.add_stake(http_client=http_client, amount=coins_to_stake):
                                                 logger.success(
                                                     f"<light-yellow>{self.session_name}</light-yellow> | "
                                                     f"Successfully added <g>{coins_to_stake}</g> AGO to stake for a week"
