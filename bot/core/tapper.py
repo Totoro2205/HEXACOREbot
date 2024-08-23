@@ -883,19 +883,20 @@ class Tapper:
                 )
                 info = await self.get_balance(http_client=http_client)
                 balance = info.get("balance") or 0
-                logger.info(
-                    f"<light-yellow>{self.session_name}</light-yellow> | "
-                    f"Balance: <g>{balance:,}</g> AGO | Level: <g>{lvl}</g> | "
-                    f"Taps limit: <g>{max_taps:,}</g> | Tap size: <g>{tap_size}</g>"
-                )
                 username, rank, overall_tokens = await self.get_leaderboard(
                     http_client=http_client
                 )
                 logger.info(
                     f"<light-yellow>{self.session_name}</light-yellow> | "
-                    f"User <light-yellow>{username}</light-yellow> is on <g>{rank}</g> place on leaderboard"
-                    f" with overall balance <g>{overall_tokens:,}</g> AGO"
+                    f"Balance: <g>{balance:,}</g> AGO | Level: <g>{lvl}</g> | Place on leaderboard: <g>{rank}</g> | "
+                    f"Taps limit: <g>{max_taps:,}</g> | Tap size: <g>{tap_size}</g>"
                 )
+
+                # logger.info(
+                #     f"<light-yellow>{self.session_name}</light-yellow> | "
+                #     f"User <light-yellow>{username}</light-yellow> is on <g>{rank}</g> place "
+                #     f" with overall balance <g>{overall_tokens:,}</g> AGO"
+                # )
 
                 if settings.GET_REFERRALS_ACTIVITY:
                     await self.get_referral_activity(http_client=http_client)
