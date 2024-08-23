@@ -1018,7 +1018,7 @@ class Tapper:
                 http_client.headers["Host"] = "ago-api.hexacore.io"
 
                 if settings.AUTO_STAKING:
-                    if settings.MIN_LVL_TO_STAKE >= lvl:
+                    if settings.MIN_LVL_TO_STAKE <= lvl:
                         info = await self.get_balance(http_client=http_client)
                         balance = info.get("balance") or 0
                         coins_to_stake = balance - settings.BALANCE_TO_SAVE
