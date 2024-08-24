@@ -939,7 +939,7 @@ class Tapper:
                         if status:
                             logger.success(
                                 f"<light-yellow>{self.session_name}</light-yellow> | Successfully tapped "
-                                f"{taps} times"
+                                f"<g>{taps:,}</g> times"
                             )
                         else:
                             logger.warning(
