@@ -1045,7 +1045,7 @@ class Tapper:
                                             if await self.add_stake(http_client=http_client, amount=coins_to_stake):
                                                 logger.success(
                                                     f"<light-yellow>{self.session_name}</light-yellow> | "
-                                                    f"Successfully added <g>{coins_to_stake}</g> AGO to stake for a week"
+                                                    f"Successfully added <g>{coins_to_stake:,}</g> AGO to stake for a week"
                                                 )
 
                 sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
