@@ -1,4 +1,5 @@
 import asyncio
+import datetime
 import time
 import aiohttp
 import json
@@ -819,6 +820,22 @@ class Tapper:
                 f"Error while stake {repr(_ex)}"
             )
 
+    async def restake(self, http_client: aiohttp.ClientSession, duration: str):
+        try:
+            json_data = {
+                'type': duration,
+            }
+            response = await http_client.post(
+                url=WebappURLs.RESTAKE, json=json_data, ssl=False
+            )
+            response_json = await response.json()
+            return response_json.get("success")
+        except Exception as _ex:
+            logger.error(
+                f"<light-yellow>{self.session_name}</light-yellow> | "
+                f"Error while restake {repr(_ex)}"
+            )
+
     async def add_stake(self, http_client: aiohttp.ClientSession, amount):
         try:
             json_data = {
@@ -1021,10 +1038,30 @@ class Tapper:
 
                 if settings.AUTO_STAKING:
                     active_stakes = await self.get_active_stakes(http_client=http_client)
+                    dt = datetime.datetime.now(datetime.timezone.utc)
+                    utc_time = dt.replace(tzinfo=datetime.timezone.utc)
+                    utc_timestamp_now = utc_time.timestamp()
+                    print(utc_timestamp_now)
                     for stake in active_stakes:
-                        pass
-
-                    # TODO Gather stakes
+                        if stake["type"] == 'week' and stake["active"]:
+                            if int(utc_timestamp_now) > int(stake["complete_at"]):
+                                if await self.restake(http_client=http_client, duration='week'):
+                                    logger.success(
+                                        f"<light-yellow>{self.session_name}</light-yellow> | "
+                                        f"Successfully restaked for a week"
+                                    )
+                            else:
+                                logger.info(
+                                    f"<light-yellow>{self.session_name}</light-yellow> | "
+                                    f"Stake for a week will restaked after <lw>"
+                                    f"{datetime.datetime.strftime(datetime.datetime.fromtimestamp(stake['complete_at']), '%Y-%m-%d %H:%M:%S')}</lw>")
+                                pass
+                        if stake["type"] == 'month' and stake["active"] and int(utc_timestamp_now) > int(stake["complete_at"]):
+                            if await self.restake(http_client=http_client, duration='month'):
+                                logger.success(
+                                    f"<light-yellow>{self.session_name}</light-yellow> | "
+                                    f"Successfully restaked for a month"
+                                )
 
                     info = await self.get_balance(http_client=http_client)
                     balance = info.get("balance") or 0
@@ -1047,6 +1084,7 @@ class Tapper:
                                                     f"<light-yellow>{self.session_name}</light-yellow> | "
                                                     f"Successfully added <g>{coins_to_stake:,}</g> AGO to stake for a week"
                                                 )
+
 
                 sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
                 logger.info(

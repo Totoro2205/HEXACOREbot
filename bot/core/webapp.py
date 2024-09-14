@@ -20,5 +20,6 @@ class WebappURLs:
     REFERRAL_ACTIVITY = f"{BASE_URL}referral-activity"
     ACTIVE_STAKES = f"{BASE_URL}staking/active"
     STAKE = f"{BASE_URL}staking/stake"
+    RESTAKE = f"{BASE_URL}staking/restake"
     ADD_STAKE = f"{BASE_URL}staking/add-base"
     UNSTAKE = f"{BASE_URL}staking/unstake"
