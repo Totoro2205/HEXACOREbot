@@ -1041,7 +1041,6 @@ class Tapper:
                     dt = datetime.datetime.now(datetime.timezone.utc)
                     utc_time = dt.replace(tzinfo=datetime.timezone.utc)
                     utc_timestamp_now = utc_time.timestamp()
-                    print(utc_timestamp_now)
                     for stake in active_stakes:
                         if stake["type"] == 'week' and stake["active"]:
                             if int(utc_timestamp_now) > int(stake["complete_at"]):
