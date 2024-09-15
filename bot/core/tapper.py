@@ -938,7 +938,7 @@ class Tapper:
                 if settings.AUTO_BUY_PASS:
                     data = await self.get_tap_passes(http_client=http_client)
                     price_7_days = int(data.get("tap_passes")["7_days"]["user_cost"])
-                    if not data.get("active_tap_pass") and balance >= price_7_days:
+                    if not data.get("active_tap_pass") and data.get("for_ago_available") and balance >= price_7_days:
                         status = await self.buy_tap_pass(http_client=http_client)
                         if status:
                             logger.success(
