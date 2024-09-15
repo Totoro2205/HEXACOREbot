@@ -989,7 +989,7 @@ class Tapper:
                     if lvl < 25:
                         logger.info(
                             f"<light-yellow>{self.session_name}</light-yellow> | "
-                            f"Upgrade to level <lw>{lvl + 1}</lw> is {'not ' if not available else ''}available "
+                            f"Upgrade to level <lw>{lvl + 1}</lw> is <lw>{'not ' if not available else ''}available</lw> "
                             f"with price <g>{price}</g>. You have overall: <g>{overall_tokens:,}</g> AGO"
                         )
                     if available and price <= balance:
