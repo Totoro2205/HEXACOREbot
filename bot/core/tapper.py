@@ -937,8 +937,13 @@ class Tapper:
 
                 if settings.AUTO_BUY_PASS:
                     data = await self.get_tap_passes(http_client=http_client)
+                    tap_pass = data.get("active_tap_pass")
+                    if tap_pass:
+                        logger.info(
+                            f"<light-yellow>{self.session_name}</light-yellow> | Active tap pass: <lw>{tap_pass['name']}</lw>"
+                        )
                     price_7_days = int(data.get("tap_passes")["7_days"]["user_cost"])
-                    if not data.get("active_tap_pass") and data.get("for_ago_available") and balance >= price_7_days:
+                    if not tap_pass and data.get("for_ago_available") and balance >= price_7_days:
                         status = await self.buy_tap_pass(http_client=http_client)
                         if status:
                             logger.success(
@@ -1093,7 +1098,7 @@ class Tapper:
 
                 sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
                 logger.info(
-                    f"<light-yellow>{self.session_name}</light-yellow> | Going sleep {format_duration(sleep_seconds)}"
+                    f"<light-yellow>{self.session_name}</light-yellow> | Going sleep <lw>{format_duration(sleep_seconds)}</lw>"
                 )
                 await asyncio.sleep(sleep_seconds)
                 # await self.auth(http_client=http_client)
