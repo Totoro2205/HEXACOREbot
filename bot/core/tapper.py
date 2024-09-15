@@ -906,7 +906,7 @@ class Tapper:
                 logger.info(
                     f"<light-yellow>{self.session_name}</light-yellow> | "
                     f"Balance: <g>{balance:,} ({overall_tokens:,})</g> AGO | "
-                    f"Level: <g>{lvl}</g> | Rank: <g>{rank}</g> | "
+                    f"Level: <g>{lvl}</g> | Rank: <g>{rank:,}</g> | "
                     f"Taps limit: <g>{max_taps:,}</g> | Tap size: <g>{tap_size}</g>"
                 )
 
@@ -981,12 +981,18 @@ class Tapper:
                     lvl, available, price, tap_size, max_taps = (
                         await self.get_level_info(http_client=http_client)
                     )
+                    if lvl < 25:
+                        logger.info(
+                            f"<light-yellow>{self.session_name}</light-yellow> | "
+                            f"Upgrade to level <lw>{lvl + 1}</lw> is {'not ' if not available else ''}available "
+                            f"with price <g>{price}</g>. You have overall: <g>{overall_tokens:,}</g> AGO"
+                        )
                     if available and price <= balance:
                         status = await self.level_up(http_client=http_client)
                         if status:
                             logger.success(
                                 f"<light-yellow>{self.session_name}</light-yellow> | "
-                                f"Successfully level up, now {lvl + 1}"
+                                f"Successfully level up, now <lw>{lvl + 1}</lw>"
                             )
 
                 if settings.PLAY_WALK_GAME:
@@ -1073,7 +1079,7 @@ class Tapper:
                                     if await self.stake(http_client=http_client, amount=coins_to_stake):
                                         logger.success(
                                             f"<light-yellow>{self.session_name}</light-yellow> | "
-                                            f"Successfully staked <g>{coins_to_stake}</g> AGO for a week"
+                                            f"Successfully staked <g>{coins_to_stake:,}</g> AGO for a week"
                                         )
                                 else:
                                     for stake in active_stakes:
