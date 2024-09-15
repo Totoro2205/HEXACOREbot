@@ -947,7 +947,7 @@ class Tapper:
                         status = await self.buy_tap_pass(http_client=http_client)
                         if status:
                             logger.success(
-                                f"<light-yellow>{self.session_name}</light-yellow> | Bought taps pass for <g>7</g> days"
+                                f"<light-yellow>{self.session_name}</light-yellow> | Bought taps pass for <lw>7</lw> days"
                             )
 
                 if settings.AUTO_TAP:
