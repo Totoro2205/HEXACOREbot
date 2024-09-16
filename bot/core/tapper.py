@@ -344,7 +344,7 @@ class Tapper:
                     url=WebappURLs.MINING_COMPLETE, json=json_data, ssl=False
                 )
                 response_json = await response.json()
-                time.sleep(3)
+                time.sleep(5)
                 if not response_json.get("success"):
                     return False
 
