@@ -1,6 +1,5 @@
 import asyncio
 import datetime
-import time
 import aiohttp
 import json
 from aiocfscrape import CloudflareScraper
