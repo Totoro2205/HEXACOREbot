@@ -805,7 +805,7 @@ class Tapper:
     async def stake(self, http_client: aiohttp.ClientSession, amount):
         try:
             json_data = {
-                "type": "week",
+                "type": settings.STAKING_TYPE,
                 "amount": amount,
             }
             response = await http_client.post(
@@ -838,7 +838,7 @@ class Tapper:
     async def add_stake(self, http_client: aiohttp.ClientSession, amount):
         try:
             json_data = {
-                "type": "week",
+                "type": settings.STAKING_TYPE,
                 "amount": amount,
             }
             response = await http_client.post(
@@ -1083,15 +1083,15 @@ class Tapper:
                                     if await self.stake(http_client=http_client, amount=coins_to_stake):
                                         logger.success(
                                             f"<light-yellow>{self.session_name}</light-yellow> | "
-                                            f"Successfully staked <g>{coins_to_stake:,}</g> AGO for a week"
+                                            f"Successfully staked <g>{coins_to_stake:,}</g> AGO for a {settings.STAKING_TYPE}"
                                         )
                                 else:
                                     for stake in active_stakes:
-                                        if stake["active"] and stake["type"] == "week":
+                                        if stake["active"] and stake["type"] == settings.STAKING_TYPE:
                                             if await self.add_stake(http_client=http_client, amount=coins_to_stake):
                                                 logger.success(
                                                     f"<light-yellow>{self.session_name}</light-yellow> | "
-                                                    f"Successfully added <g>{coins_to_stake:,}</g> AGO to stake for a week"
+                                                    f"Successfully added <g>{coins_to_stake:,}</g> AGO to stake for a {settings.STAKING_TYPE}"
                                                 )
 
 
