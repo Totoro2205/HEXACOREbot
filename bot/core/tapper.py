@@ -1064,13 +1064,17 @@ class Tapper:
                                     f"<light-yellow>{self.session_name}</light-yellow> | "
                                     f"Stake for a week will restaked after <lw>"
                                     f"{datetime.datetime.strftime(datetime.datetime.fromtimestamp(stake['complete_at']), '%Y-%m-%d %H:%M:%S')}</lw>")
-                                pass
                         if stake["type"] == 'month' and stake["active"] and int(utc_timestamp_now) > int(stake["complete_at"]):
                             if await self.restake(http_client=http_client, duration='month'):
                                 logger.success(
                                     f"<light-yellow>{self.session_name}</light-yellow> | "
                                     f"Successfully restaked for a month"
                                 )
+                            else:
+                                logger.info(
+                                    f"<light-yellow>{self.session_name}</light-yellow> | "
+                                    f"Stake for a month will restaked after <lw>"
+                                    f"{datetime.datetime.strftime(datetime.datetime.fromtimestamp(stake['complete_at']), '%Y-%m-%d %H:%M:%S')}</lw>")
 
                     info = await self.get_balance(http_client=http_client)
                     balance = info.get("balance") or 0
