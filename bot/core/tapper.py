@@ -1073,12 +1073,11 @@ class Tapper:
                         if coins_to_stake >= settings.MIN_STAKE:
                             active_stakes = await self.get_active_stakes(http_client=http_client)
                             if active_stakes is not None:
-                                if not active_stakes:
-                                    if await self.stake(http_client=http_client, amount=coins_to_stake):
-                                        logger.success(
-                                            f"<light-yellow>{self.session_name}</light-yellow> | "
-                                            f"Successfully staked <g>{coins_to_stake:,}</g> AGO for a {settings.STAKING_TYPE}"
-                                        )
+                                if await self.stake(http_client=http_client, amount=coins_to_stake):
+                                    logger.success(
+                                        f"<light-yellow>{self.session_name}</light-yellow> | "
+                                        f"Successfully staked <g>{coins_to_stake:,}</g> AGO for a {settings.STAKING_TYPE}"
+                                    )
                                 else:
                                     for stake in active_stakes:
                                         if stake["active"] and stake["type"] == settings.STAKING_TYPE:
