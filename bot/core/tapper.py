@@ -893,7 +893,7 @@ class Tapper:
                 #         )
                 #     elif status == "registered":
                 #         pass
-
+                skip_sleep = False
                 lvl, available, price, tap_size, max_taps = await self.get_level_info(
                     http_client=http_client
                 )
@@ -963,9 +963,8 @@ class Tapper:
                                 f"<g>{taps:,}</g> times"
                             )
                         else:
-                            logger.warning(
-                                f"<light-yellow>{self.session_name}</light-yellow> | Problem with taps"
-                            )
+                            logger.warning(f"<light-yellow>{self.session_name}</light-yellow> | Problem with taps")
+                            skip_sleep = True
 
                 if settings.AUTO_MISSION:
                     missions = await self.get_missions(http_client=http_client)
@@ -1063,7 +1062,7 @@ class Tapper:
                             else:
                                 logger.info(
                                     f"<light-yellow>{self.session_name}</light-yellow> | "
-                                    f"Stake for a {stake_type} will restaked after <lw>"
+                                    f"Stake for a {stake_type} will be restaked after <lw>"
                                     f"{datetime.datetime.strftime(datetime.datetime.fromtimestamp(stake['complete_at']), '%Y-%m-%d %H:%M:%S')}</lw>")
 
                     info = await self.get_balance(http_client=http_client)
@@ -1088,11 +1087,16 @@ class Tapper:
                                                 )
 
 
-                sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
-                logger.info(
-                    f"<light-yellow>{self.session_name}</light-yellow> | Going sleep <lw>{format_duration(sleep_seconds)}</lw>"
-                )
-                await asyncio.sleep(sleep_seconds)
+
+                if skip_sleep:
+                    logger.info(f"<light-yellow>{self.session_name}</light-yellow> | Skip sleeping")
+                else:
+                    sleep_seconds = randint(settings.SLEEP_TIME[0], settings.SLEEP_TIME[1])
+                    logger.info(
+                        f"<light-yellow>{self.session_name}</light-yellow> | Going sleep <lw>{format_duration(sleep_seconds)}</lw>"
+                    )
+                    await asyncio.sleep(sleep_seconds)
+
                 # await self.auth(http_client=http_client)
 
             except InvalidSession as error:
